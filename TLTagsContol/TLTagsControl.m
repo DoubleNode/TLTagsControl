@@ -61,24 +61,29 @@
     return self;
 }
 
+/*
 - (void)awakeFromNib {
     [super awakeFromNib];
     [self commonInit];
 }
+*/
 
 - (void)commonInit {
     _tags = [NSMutableArray array];
     
-    self.layer.cornerRadius = 5;
+    _tagsCornerRadius   = @5;
+    _tagsFont           = [UIFont fontWithName:@"HelveticaNeue" size:14];
+    
+    self.layer.cornerRadius = [_tagsCornerRadius doubleValue];
     
     tagSubviews_ = [NSMutableArray array];
     
     tagInputField_ = [[UITextField alloc] initWithFrame:self.frame];
-    tagInputField_.layer.cornerRadius = 5;
+    tagInputField_.layer.cornerRadius = [_tagsCornerRadius doubleValue];
     tagInputField_.layer.borderColor = [UIColor lightGrayColor].CGColor;
     tagInputField_.backgroundColor = [UIColor whiteColor];
     tagInputField_.delegate = self;
-    tagInputField_.font = [UIFont fontWithName:@"HelveticaNeue" size:14];
+    tagInputField_.font = _tagsFont;
     tagInputField_.placeholder = @"tag";
     tagInputField_.autocorrectionType = UITextAutocorrectionTypeNo;
     
@@ -92,7 +97,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     CGSize contentSize = self.contentSize;
-    CGRect frame = CGRectMake(0, 0, 100, self.frame.size.height);
+    CGRect frame = CGRectMake(0, 0, 80, self.frame.size.height);
     CGRect tempViewFrame;
     NSInteger tagIndex = 0;
     for (UIView *view in tagSubviews_) {
@@ -132,10 +137,10 @@
             frame.origin.x = view.frame.origin.x + view.frame.size.width + 4;
         }
         
-        if (self.frame.size.width - tagInputField_.frame.origin.x > 100) {
+        if (self.frame.size.width - tagInputField_.frame.origin.x > 80) {
             frame.size.width = self.frame.size.width - frame.origin.x - 12;
         } else {
-            frame.size.width = 100;
+            frame.size.width = 80;
         }
         tagInputField_.frame = frame;
     } else {
@@ -202,30 +207,30 @@
     for (NSString *tag in _tags) {
         float width = [tag boundingRectWithSize:CGSizeMake(3000,tagInputField_.frame.size.height)
                                         options:NSStringDrawingUsesLineFragmentOrigin
-                                     attributes:@{NSFontAttributeName:tagInputField_.font}
+                                     attributes:@{NSFontAttributeName:_tagsFont}
                                         context:nil].size.width;
         
         UIView *tagView = [[UIView alloc] initWithFrame:tagInputField_.frame];
         CGRect tagFrame = tagView.frame;
-        tagView.layer.cornerRadius = 5;
+        tagView.layer.cornerRadius = [_tagsCornerRadius doubleValue];
         tagFrame.origin.y = tagInputField_.frame.origin.y;
         tagView.backgroundColor = tagBackgrounColor;
         
         UILabel *tagLabel = [[UILabel alloc] init];
         CGRect labelFrame = tagLabel.frame;
-        tagLabel.font = tagInputField_.font;
+        tagLabel.font = _tagsFont;
         labelFrame.size.width = width + 16;
         labelFrame.size.height = tagInputField_.frame.size.height;
         tagLabel.text = tag;
         tagLabel.textColor = tagTextColor;
         tagLabel.textAlignment = NSTextAlignmentCenter;
         tagLabel.clipsToBounds = YES;
-        tagLabel.layer.cornerRadius = 5;
+        tagLabel.layer.cornerRadius = [_tagsCornerRadius doubleValue];
         
         if (_mode == TLTagsControlModeEdit) {
             UIButton *deleteTagButton = [[UIButton alloc] initWithFrame:tagInputField_.frame];
             CGRect buttonFrame = deleteTagButton.frame;
-            [deleteTagButton.titleLabel setFont:tagInputField_.font];
+            [deleteTagButton.titleLabel setFont:_tagsFont];
             [deleteTagButton addTarget:self action:@selector(deleteTagButton:) forControlEvents:UIControlEventTouchUpInside];
             buttonFrame.size.width = deleteTagButton.frame.size.height;
             buttonFrame.size.height = tagInputField_.frame.size.height;
@@ -315,8 +320,11 @@
     NSString *resultingString;
     NSString *text = textField.text;
     
+    NSMutableCharacterSet*  validCharacterSet   = [[NSCharacterSet alphanumericCharacterSet] mutableCopy];
+    [validCharacterSet formUnionWithCharacterSet:[NSCharacterSet punctuationCharacterSet]];
+    [validCharacterSet addCharactersInString:@" "];
     
-    if (string.length == 1 && [string rangeOfCharacterFromSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]].location != NSNotFound) {
+    if (string.length == 1 && [string rangeOfCharacterFromSet:[validCharacterSet invertedSet]].location != NSNotFound) {
         return NO;
     } else {
         if (!text || [text isEqualToString:@""]) {
@@ -330,11 +338,11 @@
                                                                       withString:string];
         }
         
-        NSArray *components = [resultingString componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
+        NSArray *components = [resultingString componentsSeparatedByCharactersInSet:[validCharacterSet invertedSet]];
         
         if (components.count > 2) {
             for (NSString *component in components) {
-                if (component.length > 0 && [component rangeOfCharacterFromSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]].location == NSNotFound) {
+                if (component.length > 0 && [component rangeOfCharacterFromSet:[validCharacterSet invertedSet]].location == NSNotFound) {
                     [self addTag:component];
                     break;
                 }
@@ -351,6 +359,21 @@
 
 - (void)setMode:(TLTagsControlMode)mode {
     _mode = mode;
+}
+
+- (void)setTagsFont:(UIFont*)tagsFont
+{
+    _tagsFont   = tagsFont;
+    
+    tagInputField_.font = _tagsFont;
+}
+
+- (void)setTagsCornerRadius:(NSNumber*)tagsCornerRadius
+{
+    _tagsCornerRadius   = tagsCornerRadius;
+    
+    self.layer.cornerRadius             = [_tagsCornerRadius doubleValue];
+    tagInputField_.layer.cornerRadius   = [_tagsCornerRadius doubleValue];
 }
 
 - (void)setTags:(NSMutableArray *)tags {

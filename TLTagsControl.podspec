@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'TLTagsControl'
-  s.version      = '1.0.0'
+  s.version      = '1.0.1'
   s.license      =  { :type => 'MIT', :file => 'LICENSE' }
   s.authors      =  { 'ali312' => 'https://github.com/ali312' }
   s.summary      = 'A nice and simple tags input control for iOS'
@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
 
 # Source Info
   s.platform     =  :ios, '6.1'
-  s.source       =  { :git => 'https://github.com/ali312/TLTagsControl', :branch => 'master' }
+  s.source       =  { :git => 'https://github.com/doublenode/TLTagsControl', :branch => 'master', :tag => s.version.to_s }
   s.source_files = 'TLTagsContol/TLTagsControl.{h,m}'
   s.requires_arc = true
 end
