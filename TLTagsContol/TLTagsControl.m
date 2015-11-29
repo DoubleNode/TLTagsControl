@@ -17,7 +17,7 @@
     NSMutableArray              *tagSubviews_;
 }
 
-@synthesize tapDelegate;
+@synthesize tagDelegate;
 
 - (instancetype)init {
     self = [super init];
@@ -61,13 +61,6 @@
     return self;
 }
 
-/*
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    [self commonInit];
-}
-*/
-
 - (void)commonInit {
     _tags = [NSMutableArray array];
     
@@ -97,7 +90,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     CGSize contentSize = self.contentSize;
-    CGRect frame = CGRectMake(0, 0, 80, self.frame.size.height);
+    CGRect frame = CGRectMake(0, 0, 100, self.frame.size.height);
     CGRect tempViewFrame;
     NSInteger tagIndex = 0;
     for (UIView *view in tagSubviews_) {
@@ -137,10 +130,10 @@
             frame.origin.x = view.frame.origin.x + view.frame.size.width + 4;
         }
         
-        if (self.frame.size.width - tagInputField_.frame.origin.x > 80) {
+        if (self.frame.size.width - tagInputField_.frame.origin.x > 100) {
             frame.size.width = self.frame.size.width - frame.origin.x - 12;
         } else {
-            frame.size.width = 80;
+            frame.size.width = 100;
         }
         tagInputField_.frame = frame;
     } else {
@@ -167,7 +160,16 @@
         }
     }
     
+    BOOL    shouldAdd = [tagDelegate tagsControl:self shouldAddTag:tag];
+    if (!shouldAdd)
+    {
+        return;
+    }
+
     [_tags addObject:tag];
+    
+    [tagDelegate tagsControl:self didAddTag:tag];
+
     [self reloadTagSubviews];
     
     CGSize contentSize = self.contentSize;
@@ -290,10 +292,22 @@
 
 - (void)deleteTagButton:(UIButton *)sender {
     UIView *view = sender.superview;
+    NSInteger index = [tagSubviews_ indexOfObject:view];
+    
+    NSString*   tag = _tags[index];
+    
+    BOOL    shouldDelete = [tagDelegate tagsControl:self shouldDeleteTag:tag];
+    if (!shouldDelete)
+    {
+        return;
+    }
+    
     [view removeFromSuperview];
     
-    NSInteger index = [tagSubviews_ indexOfObject:view];
     [_tags removeObjectAtIndex:index];
+    
+    [tagDelegate tagsControl:self didDeleteTag:tag];
+    
     [self reloadTagSubviews];
 }
 
@@ -307,8 +321,9 @@
 #pragma mark - textfield stuff
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-    if (textField.text.length > 0) {
-        NSString *tag = textField.text;
+    NSString *tag = [textField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+    if (tag.length > 0) {
         textField.text = @"";
         [self addTag:tag];
     }
@@ -386,7 +401,7 @@
 
 - (void)gestureAction:(id)sender {
     UITapGestureRecognizer *tapRecognizer = (UITapGestureRecognizer *)sender;
-    [tapDelegate tagsControl:self tappedAtIndex:tapRecognizer.view.tag];
+    [tagDelegate tagsControl:self tappedAtIndex:tapRecognizer.view.tag];
 }
 
 @end

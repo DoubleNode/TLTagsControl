@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'TLTagsControl'
-  s.version      = '1.0.1'
+  s.version      = '1.0.2'
   s.license      =  { :type => 'MIT', :file => 'LICENSE' }
   s.authors      =  { 'ali312' => 'https://github.com/ali312' }
   s.summary      = 'A nice and simple tags input control for iOS'
