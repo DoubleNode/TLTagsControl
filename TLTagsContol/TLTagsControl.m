@@ -79,6 +79,7 @@
     tagInputField_.font = _tagsFont;
     tagInputField_.placeholder = @"tag";
     tagInputField_.autocorrectionType = UITextAutocorrectionTypeNo;
+    tagInputField_.returnKeyType = UIReturnKeyNext;
     
     if (_mode == TLTagsControlModeEdit) {
         [self addSubview:tagInputField_];
@@ -323,11 +324,16 @@
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     NSString *tag = [textField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 
+    if (tag.length == 0) {
+        [textField resignFirstResponder];
+        return YES;
+    }
+    
     if (tag.length > 0) {
         textField.text = @"";
         [self addTag:tag];
     }
-    
+
     return YES;
 }
 
