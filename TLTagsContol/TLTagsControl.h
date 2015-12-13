@@ -20,6 +20,9 @@
 - (void)tagsControl:(TLTagsControl *)tagsControl didAddTag:(NSString*)tag;
 - (void)tagsControl:(TLTagsControl *)tagsControl didDeleteTag:(NSString*)tag;
 
+- (void)tagsControl:(TLTagsControl *)tagsControl didBeginEditing:(UITextField*)textField;
+- (void)tagsControl:(TLTagsControl *)tagsControl didEndEditing:(UITextField*)textField;
+
 @end
 
 typedef NS_ENUM(NSUInteger, TLTagsControlMode) {

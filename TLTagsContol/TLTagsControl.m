@@ -321,6 +321,16 @@
 
 #pragma mark - textfield stuff
 
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    [tagDelegate tagsControl:self didBeginEditing:textField];
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField
+{
+    [tagDelegate tagsControl:self didEndEditing:textField];
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     NSString *tag = [textField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 
